@@ -41,12 +41,18 @@ async def moderate_chat(update: Update, context: CallbackContext):
             await update.message.delete()
 
 # AI Chat Function
+import openai
+
 async def ai_chat(update: Update, context: CallbackContext):
-    user_message = update.message.text
+    user_message = update.message.text  # Get user message from Telegram
     chat_id = update.message.chat_id
 
     try:
-        response = await openai.ChatCompletion.acreate(
+        # Initialize OpenAI client (NEW SYNTAX for OpenAI v1.0+)
+        client = openai.OpenAI(api_key=OPENAI_API_KEY)
+
+        # Generate AI response
+        response = await client.chat.completions.create(
             model="gpt-4",
             messages=[
                 {"role": "system", "content": "You are Hedie the Sloth, expert on Slothbar and Hedera."},
@@ -54,12 +60,13 @@ async def ai_chat(update: Update, context: CallbackContext):
             ]
         )
 
-        ai_reply = response["choices"][0]["message"]["content"]
-        await update.message.reply_text(ai_reply)
+        # Extract AI reply
+        ai_reply = response.choices[0].message.content
+        await update.message.reply_text(ai_reply)  # Send AI response back to user
 
     except Exception as e:
-        logging.error(f"OpenAI API Error: {e}")
-        await update.message.reply_text("⚠️ Sorry, I'm having trouble answering right now.")
+        logging.error(f"OpenAI API Error: {e}")  # Log the exact error
+        await update.message.reply_text(f"⚠️ OpenAI API Error: {e}")  # Display error to user
 
 # Start Command
 async def start(update: Update, context: CallbackContext):
