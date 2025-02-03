@@ -3,7 +3,7 @@ import logging
 import openai
 from dotenv import load_dotenv
 from telegram import Update, ChatPermissions
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
+from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackContext
 
 # Load environment variables
 load_dotenv()
@@ -24,24 +24,24 @@ user_warnings = {}
 WARNING_LIMIT = 3
 
 # Moderation: Detect links & warn users
-def moderate_chat(update: Update, context: CallbackContext):
+async def moderate_chat(update: Update, context: CallbackContext):
     user_id = update.message.from_user.id
     chat_id = update.message.chat_id
     message_text = update.message.text
 
     if "http://" in message_text or "https://" in message_text or "t.me/" in message_text:
         user_warnings[user_id] = user_warnings.get(user_id, 0) + 1
-        update.message.reply_text(f"⚠️ Warning {user_warnings[user_id]}/{WARNING_LIMIT}: No links allowed!")
+        await update.message.reply_text(f"⚠️ Warning {user_warnings[user_id]}/{WARNING_LIMIT}: No links allowed!")
 
         if user_warnings[user_id] >= WARNING_LIMIT:
-            context.bot.ban_chat_member(chat_id, user_id)
-            update.message.reply_text(f"🚨 {update.message.from_user.first_name} was banned for repeated violations.")
+            await context.bot.ban_chat_member(chat_id, user_id)
+            await update.message.reply_text(f"🚨 {update.message.from_user.first_name} was banned for repeated violations.")
             del user_warnings[user_id]
         else:
-            update.message.delete()
+            await update.message.delete()
 
 # AI Chat Function
-def ai_chat(update: Update, context: CallbackContext):
+async def ai_chat(update: Update, context: CallbackContext):
     user_message = update.message.text
     chat_id = update.message.chat_id
 
@@ -52,23 +52,21 @@ def ai_chat(update: Update, context: CallbackContext):
     )
     
     ai_reply = response["choices"][0]["message"]["content"]
-    context.bot.send_message(chat_id=chat_id, text=ai_reply)
+    await context.bot.send_message(chat_id=chat_id, text=ai_reply)
 
 # Start Command
-def start(update: Update, context: CallbackContext):
-    update.message.reply_text("🦥 Hello! I'm Hedie the Sloth, your friendly Slothbar bot. I can chat and moderate!")
+async def start(update: Update, context: CallbackContext):
+    await update.message.reply_text("🦥 Hello! I'm Hedie the Sloth, your friendly Slothbar bot. I can chat and moderate!")
 
 # Main Function
 def main():
-    updater = Updater(BOT_TOKEN, use_context=True)
-    dp = updater.dispatcher
+    application = Application.builder().token(BOT_TOKEN).build()
 
-    dp.add_handler(CommandHandler("start", start))
-    dp.add_handler(MessageHandler(Filters.text & ~Filters.command, ai_chat))  # AI Chat
-    dp.add_handler(MessageHandler(Filters.text, moderate_chat))  # Moderation
+    application.add_handler(CommandHandler("start", start))
+    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, ai_chat))  # AI Chat
+    application.add_handler(MessageHandler(filters.TEXT, moderate_chat))  # Moderation
 
-    updater.start_polling()
-    updater.idle()
+    application.run_polling()
 
 if __name__ == '__main__':
     main()
