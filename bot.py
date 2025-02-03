@@ -60,8 +60,12 @@ async def start(update: Update, context: CallbackContext):
 
 # Main Function
 def main():
-    print("BOT_TOKEN:", repr(BOT_TOKEN))  # Debugging: Check if the token is loaded
-    application = Application.builder().token(BOT_TOKEN).build()
+    BOT_TOKEN = os.getenv("7942098238:AAGSq81r9BOFOn-_RQMXl9Jkbozza6IkNLk")
+
+print("BOT_TOKEN:", repr(BOT_TOKEN))  # Debugging: Check if the token is loaded
+
+application = Application.builder().token(BOT_TOKEN).build()
+
 
     application.add_handler(CommandHandler("start", start))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, ai_chat))  # AI Chat
