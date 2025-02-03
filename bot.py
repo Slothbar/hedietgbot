@@ -60,6 +60,7 @@ async def start(update: Update, context: CallbackContext):
 
 # Main Function
 def main():
+    print("BOT_TOKEN:", repr(BOT_TOKEN))  # Debugging: Check if the token is loaded
     application = Application.builder().token(BOT_TOKEN).build()
 
     application.add_handler(CommandHandler("start", start))
