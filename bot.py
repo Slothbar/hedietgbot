@@ -10,6 +10,7 @@ load_dotenv()
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")  # Telegram Bot Token
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")  # GPT API Key
+print(f"OPENAI_API_KEY: {repr(OPENAI_API_KEY)}")  # Debugging
 
 openai.api_key = OPENAI_API_KEY
 
