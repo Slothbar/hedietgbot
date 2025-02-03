@@ -57,8 +57,8 @@ ai_reply = response.choices[0].message.content
 await update.message.reply_text(ai_reply)
 
     
-    ai_reply = response["choices"][0]["message"]["content"]
-    await context.bot.send_message(chat_id=chat_id, text=ai_reply)
+ai_reply = response["choices"][0]["message"]["content"]
+await context.bot.send_message(chat_id=chat_id, text=ai_reply)
 
 # Start Command
 async def start(update: Update, context: CallbackContext):
