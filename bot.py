@@ -8,8 +8,8 @@ from telegram.ext import Application, CommandHandler, MessageHandler, filters, C
 # Load environment variables
 load_dotenv()
 
-BOT_TOKEN = os.getenv("7942098238:AAGSq81r9BOFOn-_RQMXl9Jkbozza6IkNLk")  # Telegram Bot Token
-OPENAI_API_KEY = os.getenv("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")  # GPT API Key
+BOT_TOKEN = os.getenv("BOT_TOKEN")  # Telegram Bot Token
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")  # GPT API Key
 
 openai.api_key = OPENAI_API_KEY
 
@@ -60,17 +60,20 @@ async def start(update: Update, context: CallbackContext):
 
 # Main Function
 def main():
-    BOT_TOKEN = os.getenv("7942098238:AAGSq81r9BOFOn-_RQMXl9Jkbozza6IkNLk")
+    
+    BOT_TOKEN = os.getenv("BOT_TOKEN")
 
-print("BOT_TOKEN:", repr(BOT_TOKEN))  # Debugging: Check if the token is loaded
+    print("BOT_TOKEN:", repr(BOT_TOKEN))  # Debugging: Check if the token is loaded
 
-application = Application.builder().token(BOT_TOKEN).build()
+    application = Application.builder().token(BOT_TOKEN).build()
 
 
+    # Add handlers
     application.add_handler(CommandHandler("start", start))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, ai_chat))  # AI Chat
     application.add_handler(MessageHandler(filters.TEXT, moderate_chat))  # Moderation
 
+    # Run the bot
     application.run_polling()
 
 if __name__ == '__main__':
