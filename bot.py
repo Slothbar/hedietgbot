@@ -54,7 +54,7 @@ async def ai_chat(update: Update, context: CallbackContext):
 
         # Generate AI response
         response = await client.chat.completions.create(
-            model="gpt-4",
+            model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": "You are Hedie the Sloth, expert on Slothbar and Hedera."},
                 {"role": "user", "content": user_message},
