@@ -45,20 +45,21 @@ async def ai_chat(update: Update, context: CallbackContext):
     user_message = update.message.text
     chat_id = update.message.chat_id
 
-    response = openai.ChatCompletion.create(
-    model="gpt-4",
-    messages=[
-        {"role": "system", "content": "You are Hedie the Sloth, expert on Slothbar and Hedera."},
-        {"role": "user", "content": user_message},
-    ]
-)
+    try:
+        response = await openai.ChatCompletion.acreate(
+            model="gpt-4",
+            messages=[
+                {"role": "system", "content": "You are Hedie the Sloth, expert on Slothbar and Hedera."},
+                {"role": "user", "content": user_message},
+            ]
+        )
 
-ai_reply = response.choices[0].message.content
-await update.message.reply_text(ai_reply)
+        ai_reply = response["choices"][0]["message"]["content"]
+        await update.message.reply_text(ai_reply)
 
-    
-ai_reply = response["choices"][0]["message"]["content"]
-await context.bot.send_message(chat_id=chat_id, text=ai_reply)
+    except Exception as e:
+        logging.error(f"OpenAI API Error: {e}")
+        await update.message.reply_text("⚠️ Sorry, I'm having trouble answering right now.")
 
 # Start Command
 async def start(update: Update, context: CallbackContext):
