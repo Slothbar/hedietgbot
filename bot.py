@@ -46,10 +46,16 @@ async def ai_chat(update: Update, context: CallbackContext):
     chat_id = update.message.chat_id
 
     response = openai.ChatCompletion.create(
-        model="gpt-4",
-        messages=[{"role": "system", "content": "You are Hedie the Sloth, expert on Slothbar and Hedera."},
-                  {"role": "user", "content": user_message}]
-    )
+    model="gpt-4",
+    messages=[
+        {"role": "system", "content": "You are Hedie the Sloth, expert on Slothbar and Hedera."},
+        {"role": "user", "content": user_message},
+    ]
+)
+
+ai_reply = response.choices[0].message.content
+await update.message.reply_text(ai_reply)
+
     
     ai_reply = response["choices"][0]["message"]["content"]
     await context.bot.send_message(chat_id=chat_id, text=ai_reply)
